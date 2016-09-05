@@ -5,6 +5,8 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by Administrator on 2016/5/8.
@@ -33,15 +35,35 @@ public class KafkaProducer {
     }
 
     void produce() {
-        int messageNo = 1000;
-        final int COUNT = 10000;
+        //1 7281
+        //5 21556 10 55774 20 71869 50 165993
+        int n=50;
+        final CountDownLatch countDownLatch=new CountDownLatch(n);
+        Long start =System.currentTimeMillis();
 
-        while (messageNo < COUNT) {
-            String key = String.valueOf(messageNo)+"007";
-            String data = "hello kafka message 007" + key;
-            producer.send(new KeyedMessage<String, String>(TOPIC, key ,data));
-            System.out.println(data);
-            messageNo ++;
+        final int COUNT = 5000;
+
+        for( int i=0;i<n;i++){
+            new Thread(new Runnable() {
+                public void run() {
+                     int messageNo = 0;
+                    while (messageNo < COUNT) {
+                        String key = String.valueOf(Thread.currentThread().getName()+":"+messageNo);
+                        String data = "hello kafka message:" + key;
+                        producer.send(new KeyedMessage<String, String>(TOPIC, key ,data));
+                        System.out.println(data);
+                        messageNo ++;
+                    }
+                    countDownLatch.countDown();
+                }
+            }).start();
+        }
+        try {
+            countDownLatch.await();
+            Long end =System.currentTimeMillis();
+            System.out.println(end-start);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
