@@ -59,6 +59,6 @@ public class KafkaConsumer2 {
     }
 
     public static void main(String[] args) {
-        new KafkaConsumer2().consume(3);
+        new KafkaConsumer2().consume(2);
     }
 }

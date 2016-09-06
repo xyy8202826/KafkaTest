@@ -5,6 +5,7 @@ import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 
 import java.util.Properties;
+import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -37,11 +38,11 @@ public class KafkaProducer {
     void produce() {
         //1 7281
         //5 21556 10 55774 20 71869 50 165993
-        int n=50;
+        int n=5;
         final CountDownLatch countDownLatch=new CountDownLatch(n);
         Long start =System.currentTimeMillis();
 
-        final int COUNT = 5000;
+        final int COUNT = 1000;
 
         for( int i=0;i<n;i++){
             new Thread(new Runnable() {
@@ -53,6 +54,13 @@ public class KafkaProducer {
                         producer.send(new KeyedMessage<String, String>(TOPIC, key ,data));
                         System.out.println(data);
                         messageNo ++;
+                  /*      Random random = new Random();
+                        long i = random.nextInt(3);
+                        try {
+                            TimeUnit.SECONDS.sleep(i);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }*/
                     }
                     countDownLatch.countDown();
                 }

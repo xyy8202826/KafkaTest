@@ -3,6 +3,9 @@ package com.xyy.kafka;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 /**
  * <p>
  * </p>
@@ -21,8 +24,18 @@ public class ConsumerMsgTask implements Runnable {
         System.out.println("Thread " + m_threadNumber);
         ConsumerIterator<String, String> it = m_stream.iterator();
         while (it.hasNext()){
+            String message = it.next().message();
             System.out.println("Thread " + m_threadNumber + ": "
-                    + new String(it.next().message()));
+                    + message +"--start");
+            Random random = new Random();
+            long i = random.nextInt(1);
+            try {
+                TimeUnit.SECONDS.sleep(i);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            System.out.println("Thread " + m_threadNumber + ": "
+                    + message +"--end");
         }
         System.out.println("Shutting down Thread: " + m_threadNumber);
     }
