@@ -1,11 +1,5 @@
 package com.xyy.kafka;
 
-import kafka.consumer.ConsumerConfig;
-import kafka.consumer.KafkaStream;
-import kafka.javaapi.consumer.ConsumerConnector;
-import kafka.serializer.StringDecoder;
-import kafka.utils.VerifiableProperties;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,13 +7,18 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import kafka.consumer.*;
+import kafka.javaapi.consumer.ConsumerConnector;
+import kafka.serializer.StringDecoder;
+import kafka.utils.VerifiableProperties;
+
 /**
  * Created by Administrator on 2016/5/8.
  */
-public class KafkaConsumer2 {
+public class KafkaConsumer3 {
     private final ConsumerConnector consumer;
 
-    private KafkaConsumer2() {
+    private KafkaConsumer3() {
         Properties props = new Properties();
         //zookeeper 配置
         props.put("zookeeper.connect", "127.0.0.1:2181");
@@ -40,25 +39,21 @@ public class KafkaConsumer2 {
         consumer = kafka.consumer.Consumer.createJavaConsumerConnector(config);
     }
 
-    void consume(int thread) {
-        ExecutorService executor = Executors.newFixedThreadPool(thread);
-        Map<String, Integer> topicCountMap = new HashMap<String, Integer>();
-        topicCountMap.put(KafkaProducer.TOPIC, thread );
-
+    void consume(int threads) {
+        ExecutorService executor = Executors.newFixedThreadPool(threads);
+        TopicFilter topicFilter = new Whitelist(KafkaProducer.TOPIC) ;
         StringDecoder keyDecoder = new StringDecoder(new VerifiableProperties());
         StringDecoder valueDecoder = new StringDecoder(new VerifiableProperties());
-
-        Map<String, List<KafkaStream<String, String>>> consumerMap =
-                consumer.createMessageStreams(topicCountMap,keyDecoder,valueDecoder);
-        List<KafkaStream<String, String> > streamList = consumerMap.get(KafkaProducer.TOPIC);
+        List<KafkaStream<String, String>> streams = consumer.createMessageStreamsByFilter(topicFilter,threads,keyDecoder,valueDecoder);
+        System.out.println("streams.size:"+streams.size());
         int threadNumber = 0;
-        for (final KafkaStream stream : streamList) {
+        for (final KafkaStream stream : streams) {
             executor.submit(new ConsumerMsgTask(stream, threadNumber));
             threadNumber++;
         }
     }
 
     public static void main(String[] args) {
-        new KafkaConsumer2().consume(2);
+        new KafkaConsumer3().consume(3);
     }
 }

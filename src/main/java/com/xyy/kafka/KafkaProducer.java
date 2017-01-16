@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class KafkaProducer {
     private final Producer<String, String> producer;
-    public final static String TOPIC = "TEST-TOPIC2";
+    public final static String TOPIC = "TEST-TOPIC";
 
     private KafkaProducer(){
         Properties props = new Properties();
@@ -36,9 +36,7 @@ public class KafkaProducer {
     }
 
     void produce() {
-        //1 7281
-        //5 21556 10 55774 20 71869 50 165993
-        int n=5;
+        int n=10;
         final CountDownLatch countDownLatch=new CountDownLatch(n);
         Long start =System.currentTimeMillis();
 

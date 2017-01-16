@@ -2,6 +2,7 @@ package com.xyy.kafka;
 
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
+import kafka.message.MessageAndMetadata;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +25,11 @@ public class ConsumerMsgTask implements Runnable {
         System.out.println("Thread " + m_threadNumber);
         ConsumerIterator<String, String> it = m_stream.iterator();
         while (it.hasNext()){
-            String message = it.next().message();
-            System.out.println("Thread " + m_threadNumber + ": "
+            MessageAndMetadata<String,String> messageAndMetadata = it.next();
+            String message = messageAndMetadata.message();
+            int partition = messageAndMetadata.partition();
+            //String messageAndMetadata
+            System.out.println("Thread " + m_threadNumber + ": partition:"+partition+":message"
                     + message +"--start");
             Random random = new Random();
             long i = random.nextInt(1);

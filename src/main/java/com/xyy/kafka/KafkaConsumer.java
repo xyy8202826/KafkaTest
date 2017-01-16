@@ -4,6 +4,7 @@ import kafka.consumer.ConsumerConfig;
 import kafka.consumer.ConsumerIterator;
 import kafka.consumer.KafkaStream;
 import kafka.javaapi.consumer.ConsumerConnector;
+import kafka.message.MessageAndMetadata;
 import kafka.serializer.StringDecoder;
 import kafka.utils.VerifiableProperties;
 
@@ -51,7 +52,13 @@ public class KafkaConsumer {
         KafkaStream<String, String> stream = consumerMap.get(KafkaProducer.TOPIC).get(0);
         ConsumerIterator<String, String> it = stream.iterator();
         while (it.hasNext())
-            System.out.println(it.next().message());
+        {
+            MessageAndMetadata<String,String> messageAndMetadata = it.next();
+            String message = messageAndMetadata.message();
+            int partition = messageAndMetadata.partition();
+            System.out.println("partition:"+partition+":"+message);
+        }
+
     }
 
     public static void main(String[] args) {
